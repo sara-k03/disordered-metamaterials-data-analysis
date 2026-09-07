@@ -16,6 +16,10 @@ delaunay_datasets = [
     {"a": 0.5,   "file": "DATA/Delaunay/OrientationO/PC216D3D_Delaunay_1.5mm_75mm_a0.5_orientationO.csv",       "load": 36, "mass": 30.85, "orientation": "O", "title": "Delaunay, a=0.5"},
     {"a": 0.75,  "file": "DATA/Delaunay/OrientationO/PC216D3Dcl_Delaunay_1.5mm_75mm_a0.75_OrientationO.csv",    "load": 36, "mass": 31.59, "orientation": "O", "title": "Delaunay, a=0.75"},
     {"a": 1.00,  "file": "DATA/Delaunay/OrientationO/PC216D3D_Delaunay_1.5mm_75mm_a1.00_OrientationO.csv",      "load": 36, "mass": 31.92, "orientation": "O", "title": "Delaunay, a=1.0"},
+
+    # Mass reused from the OrientationO sample at the same a-value (orientation doesn't affect mass).
+    {"a": 0.001, "file": "DATA/Delaunay/Orientation1/PC216M3Db_Delaunay_1.5mm_75mm_a0.001_Orientation1.csv",    "load": 36, "mass": 33.34, "orientation": "1", "title": "Delaunay, a=0.001, Orientation 1"},
+    {"a": 0.25,  "file": "DATA/Delaunay/OrientationN/PC216D3D_Delaunay_1.5mm_75mm_a0.25_OrientationN.csv",      "load": 36, "mass": 32.71, "orientation": "N", "title": "Delaunay, a=0.25, Orientation N"},
 ]
 
 # Masses sourced from script-cycle-G.py (masses array aligned to a_values [0.001, 0.125, 0.25, 0.5, 0.75, 1])
@@ -44,6 +48,9 @@ voronoi_datasets = [
     {"a": 0.5,   "file": "DATA/Voronoi/Orientation1/PC216V3D_Voronoi_1.5mm_75mm_a0.5_Orientation1.csv",    "load": 36, "mass": 17.58, "orientation": "1", "title": "Voronoi, a=0.5, Orientation 1"},
     {"a": 0.75,  "file": "DATA/Voronoi/Orientation1/PC216V3D_Voronoi_1.5mm_75mm_a0.75_Orientation1.csv",   "load": 76, "mass": 17.85, "orientation": "1", "title": "Voronoi, a=0.75, Orientation 1"},
     {"a": 1.00,  "file": "DATA/Voronoi/Orientation1/PC216V3D_Voronoi_1.5mm_75mm_a1_Orientation1.csv",      "load": 47, "mass": 18.25, "orientation": "1", "title": "Voronoi, a=1.0, Orientation 1"},
+
+    # Mass reused from the O/1 orientation sample at a=0.25 (orientation doesn't affect mass).
+    {"a": 0.25,  "file": "DATA/Voronoi/OrientationN/PC216V3D_Voronoi_1.5mm_75mm_a0.25_OrientationN.csv",   "load": 36, "mass": 17.26, "orientation": "N", "title": "Voronoi, a=0.25, Orientation N"},
 ]
 
 TESSELATION_DATASETS = {
