@@ -238,7 +238,7 @@ def plot_weighted_tesselation(tesselation, ax=None, save_path=None, show=True):
     ax.legend([legend_handles[a] for a in all_a_values], [f"a={a}" for a in all_a_values])
 
     ax.tick_params(axis='both', labelsize=12)
-    ax.set_title(f"{title} — Weighted Triangle Count vs Disorder (x-hat, y-hat, z-hat)")
+    ax.set_title(f"{title} — Weighted Triangle Count vs Disorder")
     plt.tight_layout()
 
     if save_path:
@@ -339,14 +339,14 @@ if __name__ == "__main__":
     os.makedirs(OUTPUT_ROOT, exist_ok=True)
 
     """This is to generate the plot for weighted triangles"""
-    for letter in TESSELATION_NAMES:
-        title = TESSELATION_NAMES[letter]
-        plot_weighted_tesselation(
-            letter,
-            save_path=os.path.join(OUTPUT_ROOT, f"{title}-Weighted-Triangles-vs-Disorder.png"),
-            show=False,
-        )
-        plt.close("all")
+    # for letter in TESSELATION_NAMES:
+    #     title = TESSELATION_NAMES[letter]
+    #     plot_weighted_tesselation(
+    #         letter,
+    #         save_path=os.path.join(OUTPUT_ROOT, f"{title}-Weighted-Triangles-vs-Disorder.png"),
+    #         show=False,
+    #     )
+    #     plt.close("all")
 
     """This is for the visualization plots, no plot has been made for this yet"""
     # visualize_weighted_triangles("centroidal", 1, "x", output_dir=None, show=True)
