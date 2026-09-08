@@ -66,3 +66,46 @@ TESSELATION_NAMES = {
     "G": "Gabriel",
     "V": "Voronoi",
 }
+
+centroidal_npy_datasets = [
+    {"a": 0.001, "adjacency_file": "adjacency_matrices/Centroidal/PC216M3Db_216_3D-box_Z3_C_URL_adj_0.001.npy", "point_cloud_file": "point_clouds/Centroidal/PC216M3Db_216_3D-box_Z3_C_URL_xy_0.001.npy"},
+    {"a": 0.125, "adjacency_file": "adjacency_matrices/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_adj_0.125.npy",  "point_cloud_file": "point_clouds/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_xy_0.125.npy"},
+    {"a": 0.25,  "adjacency_file": "adjacency_matrices/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_adj_0.25.npy",   "point_cloud_file": "point_clouds/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_xy_0.25.npy"},
+    {"a": 0.5,   "adjacency_file": "adjacency_matrices/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_adj_0.50.npy",   "point_cloud_file": "point_clouds/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_xy_0.50.npy"},
+    {"a": 0.75,  "adjacency_file": "adjacency_matrices/Centroidal/PC216C3Dcl_216_3D-box_Z3_C_URL_adj_0.75.npy", "point_cloud_file": "point_clouds/Centroidal/PC216C3Dcl_216_3D-box_Z3_C_URL_xy_0.75.npy"},
+    {"a": 1.00,  "adjacency_file": "adjacency_matrices/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_adj_1.00.npy",   "point_cloud_file": "point_clouds/Centroidal/PC216C3D_216_3D-box_Z3_C_URL_xy_1.00.npy"},
+]
+
+delaunay_npy_datasets = [
+    {"a": 0.001, "adjacency_file": "adjacency_matrices/Delaunay/PC216M3Db_216_3D-box_Z3_D_URL_adj_0.001.npy", "point_cloud_file": "point_clouds/Delaunay/PC216M3Db_216_3D-box_Z3_D_URL_xy_0.001.npy"},
+    {"a": 0.125, "adjacency_file": "adjacency_matrices/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_adj_0.125.npy",  "point_cloud_file": "point_clouds/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_xy_0.125.npy"},
+    {"a": 0.25,  "adjacency_file": "adjacency_matrices/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_adj_0.25.npy",   "point_cloud_file": "point_clouds/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_xy_0.25.npy"},
+    {"a": 0.5,   "adjacency_file": "adjacency_matrices/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_adj_0.50.npy",   "point_cloud_file": "point_clouds/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_xy_0.50.npy"},
+    {"a": 0.75,  "adjacency_file": "adjacency_matrices/Delaunay/PC216D3Dcl_216_3D-box_Z3_D_URL_adj_0.75.npy", "point_cloud_file": "point_clouds/Delaunay/PC216D3Dcl_216_3D-box_Z3_D_URL_xy_0.75.npy"},
+    {"a": 1.00,  "adjacency_file": "adjacency_matrices/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_adj_1.00.npy",   "point_cloud_file": "point_clouds/Delaunay/PC216D3D_216_3D-box_Z3_D_URL_xy_1.00.npy"},
+]
+
+gabriel_npy_datasets = [
+    {"a": 0.001, "adjacency_file": "adjacency_matrices/Gabriel/PC216M3Db_216_3D-box_Z3_G_URL_adj_0.001.npy", "point_cloud_file": "point_clouds/Gabriel/PC216M3Db_216_3D-box_Z3_G_URL_xy_0.001.npy"},
+    {"a": 0.125, "adjacency_file": "adjacency_matrices/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_adj_0.125.npy",  "point_cloud_file": "point_clouds/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_xy_0.125.npy"},
+    {"a": 0.25,  "adjacency_file": "adjacency_matrices/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_adj_0.25.npy",   "point_cloud_file": "point_clouds/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_xy_0.25.npy"},
+    {"a": 0.5,   "adjacency_file": "adjacency_matrices/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_adj_0.50.npy",   "point_cloud_file": "point_clouds/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_xy_0.50.npy"},
+    {"a": 0.75,  "adjacency_file": "adjacency_matrices/Gabriel/PC216G3Dcl_216_3D-box_Z3_G_URL_adj_0.75.npy", "point_cloud_file": "point_clouds/Gabriel/PC216G3Dcl_216_3D-box_Z3_G_URL_xy_0.75.npy"},
+    {"a": 1.00,  "adjacency_file": "adjacency_matrices/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_adj_1.00.npy",   "point_cloud_file": "point_clouds/Gabriel/PC216G3D_216_3D-box_Z3_G_URL_xy_1.00.npy"},
+]
+
+voronoi_npy_datasets = [
+    {"a": 0.001, "adjacency_file": "adjacency_matrices/Voronoi/PC216M3Db_216_3D-box_Z3_V_URL_adj_0.001.npy", "point_cloud_file": "point_clouds/Voronoi/PC216M3Db_216_3D-box_Z3_V_URL_xy_0.001.npy"},
+    {"a": 0.125, "adjacency_file": "adjacency_matrices/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_adj_0.125.npy",  "point_cloud_file": "point_clouds/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_xy_0.125.npy"},
+    {"a": 0.25,  "adjacency_file": "adjacency_matrices/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_adj_0.25.npy",   "point_cloud_file": "point_clouds/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_xy_0.25.npy"},
+    {"a": 0.5,   "adjacency_file": "adjacency_matrices/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_adj_0.50.npy",   "point_cloud_file": "point_clouds/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_xy_0.50.npy"},
+    {"a": 0.75,  "adjacency_file": "adjacency_matrices/Voronoi/PC216V3Dcl_216_3D-box_Z3_V_URL_adj_0.75.npy", "point_cloud_file": "point_clouds/Voronoi/PC216V3Dcl_216_3D-box_Z3_V_URL_xy_0.75.npy"},
+    {"a": 1.00,  "adjacency_file": "adjacency_matrices/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_adj_1.00.npy",   "point_cloud_file": "point_clouds/Voronoi/PC216V3D_216_3D-box_Z3_V_URL_xy_1.00.npy"},
+]
+
+NPY_DATASETS = {
+    "C": centroidal_npy_datasets,
+    "D": delaunay_npy_datasets,
+    "G": gabriel_npy_datasets,
+    "V": voronoi_npy_datasets,
+}
