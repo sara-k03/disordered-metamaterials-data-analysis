@@ -18,6 +18,7 @@ if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
 from dataset_imports import *
+from plot_specific_modulus import specific_modulus
 
 OUTPUT_ROOT = "triangle_plots"
 
@@ -105,15 +106,29 @@ def count_triangles(file):
     return len(list(all_triangles(_load_graph(file))))
 
 
-def count_weighted_triangles(tesselation, a, axis):
+def _triangle_axis_weight(u, v, w, coords, axis_vec):
     """
-    Sum, over every triangle in a tesselation sample's graph, the absolute dot product of
-    the triangle's area-weighted normal vector with a coordinate axis.
+    Weight for one triangle (u, v, w): the component of its area-weighted normal vector
+    that's perpendicular to `axis_vec`, i.e. |normal x axis_vec| = |normal| * sin(theta)
+    where theta is the angle between the normal and the axis.
 
     Each triangle's normal is the cross product of two of its edges, so its magnitude is
-    twice the triangle's area -- bigger, more axis-aligned triangles contribute more. The
-    absolute value is used because a triangle's normal direction depends on an arbitrary
-    vertex ordering from all_triangles(), not any real geometric property.
+    twice the triangle's area -- bigger triangles contribute more. Weighting by the
+    perpendicular component (rather than the parallel/dot-product component) means a
+    triangle contributes most when its normal is perpendicular to the axis (theta=90,
+    weight=|normal|) and nothing when its normal is parallel to the axis (theta=0,
+    weight=0), i.e. triangles whose face contains the axis direction dominate.
+    """
+    normal = np.cross(coords[v] - coords[u], coords[w] - coords[u])
+    return np.linalg.norm(np.cross(normal, axis_vec))
+
+
+def count_weighted_triangles(tesselation, a, axis):
+    """
+    Sum, over every triangle in a tesselation sample's graph, the perpendicular
+    (axis-normal) component of the triangle's area-weighted normal vector -- see
+    _triangle_axis_weight. Triangles whose normal is perpendicular to `axis` (i.e. the
+    triangle's face contains the axis direction) contribute the most.
 
     tesselation - a tesselation letter ("C", "D", "G", "V") or name ("Centroidal", ...)
     a           - disorder value, e.g. 0.25 (must have a saved adjacency/point-cloud pair)
@@ -125,15 +140,10 @@ def count_weighted_triangles(tesselation, a, axis):
     G = _load_graph(dataset["adjacency_file"])
     coords = np.load(dataset["point_cloud_file"])
 
-    total = 0.0
-    for u, v, w in all_triangles(G):
-        normal = np.cross(coords[v] - coords[u], coords[w] - coords[u])
-        total += abs(np.dot(normal, axis_vec))
-
-    return total
+    return sum(_triangle_axis_weight(u, v, w, coords, axis_vec) for u, v, w in all_triangles(G))
 
 
-def plot_tesselation(tesselation, ax=None, save_path=None, show=True):
+def plot_tesselation(tesselation, ax=None, save_path=None, show=True, start_zero=True):
     """
     Graphs number of triangles vs. a-value (Kick Size, alpha) for every saved sample of a
     tesselation, using the same marker/color-by-a-value convention as plot_specific_modulus.
@@ -142,6 +152,7 @@ def plot_tesselation(tesselation, ax=None, save_path=None, show=True):
     ax          - optional existing matplotlib Axes to draw on; a new figure/axes is made if omitted
     save_path   - optional path to save the figure to
     show        - whether to display the figure (plt.show())
+    start_zero  - if True, the y-axis starts at 0
     """
     letter = _resolve_tesselation(tesselation)
     title = TESSELATION_NAMES[letter]
@@ -180,6 +191,8 @@ def plot_tesselation(tesselation, ax=None, save_path=None, show=True):
 
     ax.tick_params(axis='both', labelsize=12)
     ax.set_title(f"{title} — Number of Triangles vs Disorder")
+    if start_zero:
+        ax.set_ylim(bottom=0)
     plt.tight_layout()
 
     if save_path:
@@ -191,7 +204,7 @@ def plot_tesselation(tesselation, ax=None, save_path=None, show=True):
     return ax
 
 
-def plot_weighted_tesselation(tesselation, ax=None, save_path=None, show=True):
+def plot_weighted_tesselation(tesselation, ax=None, save_path=None, show=True, start_zero=True):
     """
     Graphs weighted-triangle count (see count_weighted_triangles) vs. a-value (Kick Size,
     alpha) for every saved sample of a tesselation, plotting all three of x-hat, y-hat, and
@@ -202,6 +215,7 @@ def plot_weighted_tesselation(tesselation, ax=None, save_path=None, show=True):
     ax          - optional existing matplotlib Axes to draw on; a new figure/axes is made if omitted
     save_path   - optional path to save the figure to
     show        - whether to display the figure (plt.show())
+    start_zero  - if True, the y-axis starts at 0
     """
     letter = _resolve_tesselation(tesselation)
     title = TESSELATION_NAMES[letter]
@@ -239,6 +253,149 @@ def plot_weighted_tesselation(tesselation, ax=None, save_path=None, show=True):
 
     ax.tick_params(axis='both', labelsize=12)
     ax.set_title(f"{title} — Weighted Triangle Count vs Disorder")
+    if start_zero:
+        ax.set_ylim(bottom=0)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path)
+
+    if show:
+        plt.show()
+
+    return ax
+
+
+def plot_triangles_vs_modulus(tesselation, cycle=CYCLE, ax=None, save_path=None, show=True, start_zero=True):
+    """
+    Graphs number of triangles (x-axis) vs. specific modulus (y-axis, from
+    plot_specific_modulus.specific_modulus) for every saved sample of a tesselation. Marker
+    and color are keyed by a-value, same convention as plot_tesselation. Since specific
+    modulus data can have multiple orientations per a-value (see specific_modulus), every
+    orientation is plotted -- points sharing an a-value share the same x (triangle count)
+    but may differ in y (that orientation's specific modulus).
+
+    tesselation - a tesselation letter ("C", "D", "G", "V") or name ("Centroidal", ...)
+    cycle       - which loading cycle to isolate (passed through to specific_modulus)
+    ax          - optional existing matplotlib Axes to draw on; a new figure/axes is made if omitted
+    save_path   - optional path to save the figure to
+    show        - whether to display the figure (plt.show())
+    start_zero  - if True, the y-axis starts at 0
+    """
+    letter = _resolve_tesselation(tesselation)
+    title = TESSELATION_NAMES[letter]
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    datasets = sorted(NPY_DATASETS[letter], key=lambda d: d["a"])
+    all_a_values = [d["a"] for d in datasets]
+    marker_for_a = {a: MARKERS[i % len(MARKERS)] for i, a in enumerate(all_a_values)}
+    color_for_a = {a: COLORS[i % len(COLORS)] for i, a in enumerate(all_a_values)}
+    triangles_for_a = {d["a"]: count_triangles(d["adjacency_file"]) for d in datasets}
+
+    modulus_data = specific_modulus(letter, cycle=cycle)
+
+    # Collect one legend handle per a-value
+    legend_handles = {}
+
+    for i in range(len(modulus_data["a_values"])):
+        a = modulus_data["a_values"][i]
+        handle = ax.errorbar(
+            triangles_for_a[a],
+            modulus_data["specific_modulus"][i],
+            yerr=modulus_data["specific_modulus_err"][i],
+            fmt=marker_for_a[a],
+            color=color_for_a[a],
+            markersize=12,
+            capsize=8,
+            elinewidth=2,
+            label=f"a={a}",
+        )
+        legend_handles[a] = handle
+
+    ax.set_xlabel("Number of Triangles", fontsize=12)
+    ax.set_ylabel(r"Specific Modulus, $\mathrm{N\ mm^{-1}\ kg^{-1}}$", fontsize=12)
+    ax.legend([legend_handles[a] for a in all_a_values], [f"a={a}" for a in all_a_values])
+
+    ax.tick_params(axis='both', labelsize=12)
+    ax.set_title(f"{title} Cycle {cycle} — Specific Modulus vs Number of Triangles")
+    if start_zero:
+        ax.set_ylim(bottom=0)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path)
+
+    if show:
+        plt.show()
+
+    return ax
+
+
+def plot_weighted_triangles_vs_modulus(tesselation, cycle=CYCLE, ax=None, save_path=None, show=True, start_zero=True):
+    """
+    Graphs weighted-triangle count (x-axis, see count_weighted_triangles) vs. specific
+    modulus (y-axis, from plot_specific_modulus.specific_modulus) for every saved sample of
+    a tesselation, plotting all three of x-hat, y-hat, and z-hat for each a-value. Color
+    distinguishes a-value (same convention as plot_tesselation); marker shape distinguishes
+    axis -- a literal "X", "Y", or "Z" glyph. Every specific-modulus orientation is plotted
+    (see plot_triangles_vs_modulus), so a given a-value/axis pair may appear at the same x
+    with multiple y's.
+
+    tesselation - a tesselation letter ("C", "D", "G", "V") or name ("Centroidal", ...)
+    cycle       - which loading cycle to isolate (passed through to specific_modulus)
+    ax          - optional existing matplotlib Axes to draw on; a new figure/axes is made if omitted
+    save_path   - optional path to save the figure to
+    show        - whether to display the figure (plt.show())
+    start_zero  - if True, the y-axis starts at 0
+    """
+    letter = _resolve_tesselation(tesselation)
+    title = TESSELATION_NAMES[letter]
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    datasets = sorted(NPY_DATASETS[letter], key=lambda d: d["a"])
+    all_a_values = [d["a"] for d in datasets]
+    color_for_a = {a: COLORS[i % len(COLORS)] for i, a in enumerate(all_a_values)}
+    marker_for_axis = {"x": "$X$", "y": "$Y$", "z": "$Z$"}
+    weighted_for_a = {
+        a: {axis: count_weighted_triangles(letter, a, axis) for axis in ("x", "y", "z")}
+        for a in all_a_values
+    }
+
+    modulus_data = specific_modulus(letter, cycle=cycle)
+
+    # Collect one legend handle per a-value (color), not per axis (the X/Y/Z glyphs are
+    # self-explanatory).
+    legend_handles = {}
+
+    for i in range(len(modulus_data["a_values"])):
+        a = modulus_data["a_values"][i]
+        for axis in ("x", "y", "z"):
+            handle = ax.errorbar(
+                weighted_for_a[a][axis],
+                modulus_data["specific_modulus"][i],
+                yerr=modulus_data["specific_modulus_err"][i],
+                marker=marker_for_axis[axis],
+                linestyle='none',
+                color=color_for_a[a],
+                markersize=12,
+                capsize=8,
+                elinewidth=2,
+                label=f"a={a}",
+            )
+            legend_handles.setdefault(a, handle)
+
+    ax.set_xlabel("Weighted Triangle Count", fontsize=12)
+    ax.set_ylabel(r"Specific Modulus, $\mathrm{N\ mm^{-1}\ kg^{-1}}$", fontsize=12)
+    ax.legend([legend_handles[a] for a in all_a_values], [f"a={a}" for a in all_a_values])
+
+    ax.tick_params(axis='both', labelsize=12)
+    ax.set_title(f"{title} Cycle {cycle} — Specific Modulus vs Weighted Triangle Count")
+    if start_zero:
+        ax.set_ylim(bottom=0)
     plt.tight_layout()
 
     if save_path:
@@ -253,7 +410,7 @@ def plot_weighted_tesselation(tesselation, ax=None, save_path=None, show=True):
 def visualize_weighted_triangles(tesselation, a, axis, output_dir=None, show=True):
     """
     Draws one tesselation sample's 3D network (nodes + edges) with every triangle face
-    filled in, shaded darker the higher its weighted dot product with `axis` is (see
+    filled in, shaded darker the more perpendicular its normal is to `axis` (see
     count_weighted_triangles). The plot title also reports the total weighted-triangle
     count for `axis`, computed via count_weighted_triangles.
 
@@ -273,7 +430,7 @@ def visualize_weighted_triangles(tesselation, a, axis, output_dir=None, show=Tru
     coords = np.load(dataset["point_cloud_file"])
 
     triangles = list(all_triangles(G))
-    weights = [abs(np.dot(np.cross(coords[v] - coords[u], coords[w] - coords[u]), axis_vec)) for u, v, w in triangles]
+    weights = [_triangle_axis_weight(u, v, w, coords, axis_vec) for u, v, w in triangles]
 
     fig = plt.figure(figsize=(9, 7))
     ax = fig.add_subplot(111, projection="3d")
@@ -287,7 +444,7 @@ def visualize_weighted_triangles(tesselation, a, axis, output_dir=None, show=Tru
             color="gray", alpha=0.4, linewidth=1, zorder=1,
         )
 
-    # Triangle faces -- darker red means a higher |normal . axis| dot product
+    # Triangle faces -- darker red means the normal is more perpendicular to the axis
     if triangles:
         cmap = plt.colormaps["Reds"]
         norm = mcolors.Normalize(vmin=min(weights), vmax=max(weights))
@@ -299,7 +456,7 @@ def visualize_weighted_triangles(tesselation, a, axis, output_dir=None, show=Tru
 
         mappable = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
         mappable.set_array([])
-        plt.colorbar(mappable, ax=ax, label=f"|normal · {axis}| (area-weighted)", shrink=0.6)
+        plt.colorbar(mappable, ax=ax, label=f"|normal × {axis}| (area-weighted)", shrink=0.6)
 
     # Reference arrow showing the axis direction, placed just outside the point cloud
     bounds_min = coords.min(axis=0)
@@ -339,24 +496,44 @@ if __name__ == "__main__":
     os.makedirs(OUTPUT_ROOT, exist_ok=True)
 
     """This is to generate the plot for weighted triangles"""
-    # for letter in TESSELATION_NAMES:
-    #     title = TESSELATION_NAMES[letter]
-    #     plot_weighted_tesselation(
-    #         letter,
-    #         save_path=os.path.join(OUTPUT_ROOT, f"{title}-Weighted-Triangles-vs-Disorder.png"),
-    #         show=False,
-    #     )
-    #     plt.close("all")
+    for letter in TESSELATION_NAMES:
+        title = TESSELATION_NAMES[letter]
+        plot_weighted_tesselation(
+            letter,
+            save_path=os.path.join(OUTPUT_ROOT, f"{title}-Weighted-Triangles-vs-Disorder.png"),
+            show=False,
+        )
+        plt.close("all")
 
     """This is for the visualization plots, no plot has been made for this yet"""
     # visualize_weighted_triangles("centroidal", 1, "x", output_dir=None, show=True)
 
     """This is to generate the plot for all triangles"""
-    # for letter in TESSELATION_NAMES:
-    #     title = TESSELATION_NAMES[letter]
-    #     plot_tesselation(
-    #         letter,
-    #         save_path=os.path.join(OUTPUT_ROOT, f"{title}-Triangles-vs-Disorder.png"),
-    #         show=False,
-    #     )
-    #     plt.close("all")
+    for letter in TESSELATION_NAMES:
+        title = TESSELATION_NAMES[letter]
+        plot_tesselation(
+            letter,
+            save_path=os.path.join(OUTPUT_ROOT, f"{title}-Triangles-vs-Disorder.png"),
+            show=False,
+        )
+        plt.close("all")
+
+    """This is to generate the plot for number of triangles vs specific modulus"""
+    for letter in TESSELATION_NAMES:
+        title = TESSELATION_NAMES[letter]
+        plot_triangles_vs_modulus(
+            letter,
+            save_path=os.path.join(OUTPUT_ROOT, f"{title}-Triangles-vs-Specific-Modulus.png"),
+            show=False,
+        )
+        plt.close("all")
+
+    """This is to generate the plot for weighted triangles vs specific modulus"""
+    for letter in TESSELATION_NAMES:
+        title = TESSELATION_NAMES[letter]
+        plot_weighted_triangles_vs_modulus(
+            letter,
+            save_path=os.path.join(OUTPUT_ROOT, f"{title}-Weighted-Triangles-vs-Specific-Modulus.png"),
+            show=False,
+        )
+        plt.close("all")
